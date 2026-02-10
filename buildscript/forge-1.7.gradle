@@ -53,19 +53,21 @@ project.ext.override_dependencies = false
 apply from: "project.gradle"
 
 jar {
-    from(sourceSets.main.output);
+	from(sourceSets.main.output)
 
-    // embed libraries in jar
-    from configurations.embed.collect {
-        exclude '**/LICENSE', '**/LICENSE.txt'
-        it.isDirectory() ? it : zipTree(it)
-    }
-    
-    configurations.shade.each { dep ->
-        from(project.zipTree(dep)){
-            exclude '**/LICENSE', '**/LICENSE.txt', 'META-INF', 'META-INF/**'
-        }
-    }
+	from(configurations.embed.collect {
+		it.isDirectory() ? it : zipTree(it)
+	}) {
+		exclude 'META-INF/**'
+		exclude '**/LICENSE', '**/LICENSE.txt'
+	}
+
+	configurations.shade.each { dep ->
+		from(zipTree(dep)) {
+			exclude 'META-INF/**'
+			exclude '**/LICENSE', '**/LICENSE.txt'
+		}
+	}
 }
 
 processResources {
